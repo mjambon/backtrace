@@ -1,6 +1,14 @@
 open Lwt
 open Printf
 
+(*** Utilities meant to be in their own module ***)
+
+(*
+   Exceptions are wrapped into a Traced exception.
+   Printing them is done with print_exception defined below.
+   Catching and inspecting them would require some unwrapping.
+*)
+
 type loc = string
 
 type traced = {
@@ -65,8 +73,14 @@ let create_thread loc f x =
     )
     (fun e -> trace_loc e loc)
 
-let bind loc t f =
-  t >>= create_thread loc f
+(*** Test program ***)
+
+(*
+   Each time a thread is created after a bind,
+   we wrap the thread (normally using a preprocessor)
+   such that exceptions are caught and wrapped into a special
+   exception type.
+*)
 
 let z () =
   if bool_of_string "false" then
