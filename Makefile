@@ -3,7 +3,7 @@
 default: all
 all: \
   trace_fail.opt trace_ok.opt trace_inline_ok.opt trace_inline_fail.opt \
-  trace_lwt_fail.opt trace_lwt_wrap.opt
+  trace_lwt_ok.opt trace_lwt_fail.opt trace_lwt_wrap.opt
 
 # Missing call point despite -inline 0
 trace_fail.opt: trace_fail.ml
@@ -25,11 +25,11 @@ trace_inline_fail.opt: trace_inline.ml
 	ocamlopt -o trace_inline_fail.opt -g trace_inline.ml
 	./$@ > $@.out
 
-# Missing trace despite using Lwt.backtrace_bind
-trace_lwt_wrap.opt: trace_lwt_wrap.ml
-	ocamlfind ocamlopt -o trace_lwt_wrap.opt \
-	  -g -package lwt.unix -linkpkg \
-	  trace_lwt_wrap.ml
+# Decent trace achieved with Lwt.backtrace_bind and reraise
+trace_lwt_ok.opt: trace_lwt_ok.ml
+	ocamlfind ocamlopt -o trace_lwt_ok.opt \
+	  -g -inline 0 -package lwt.unix -linkpkg \
+	  trace_lwt_ok.ml
 	./$@ > $@.out
 
 # Missing trace despite using Lwt.backtrace_bind
@@ -37,6 +37,13 @@ trace_lwt_fail.opt: trace_lwt_fail.ml
 	ocamlfind ocamlopt -o trace_lwt_fail.opt \
 	  -g -inline 0 -package lwt.unix -linkpkg \
 	  trace_lwt_fail.ml
+	./$@ > $@.out
+
+# Missing trace despite using Lwt.backtrace_bind
+trace_lwt_wrap.opt: trace_lwt_wrap.ml
+	ocamlfind ocamlopt -o trace_lwt_wrap.opt \
+	  -g -package lwt.unix -linkpkg \
+	  trace_lwt_wrap.ml
 	./$@ > $@.out
 
 clean:
