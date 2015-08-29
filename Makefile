@@ -3,7 +3,7 @@
 default: all
 all: \
   trace_fail.opt trace_ok.opt trace_inline_ok.opt trace_inline_fail.opt \
-  trace_lwt_ok.opt trace_lwt_fail.opt trace_lwt_wrap.opt
+  trace_mixup.opt trace_lwt_ok.opt trace_lwt_fail.opt trace_lwt_wrap.opt
 
 # Missing call point despite -inline 0
 trace_fail.opt: trace_fail.ml
@@ -23,6 +23,11 @@ trace_inline_ok.opt: trace_inline.ml
 # Incomplete trace when not using -inline 0
 trace_inline_fail.opt: trace_inline.ml
 	ocamlopt -o trace_inline_fail.opt -g trace_inline.ml
+	./$@ > $@.out
+
+# Misuse of reraise leading to wrong (or incomplete) trace
+trace_mixup.opt: trace_mixup.ml
+	ocamlopt -o trace_mixup.opt -g trace_mixup.ml
 	./$@ > $@.out
 
 # Decent trace achieved with Lwt.backtrace_bind and reraise
